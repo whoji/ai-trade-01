@@ -1,3 +1,5 @@
+# ref: https://github.com/PacktPublishing/Deep-Reinforcement-Learning-Hands-On/blob/master/Chapter08/lib/environ.py
+
 import gym
 import enum
 import data_io as data
