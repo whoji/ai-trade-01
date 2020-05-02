@@ -1,12 +1,18 @@
 # ref: https://github.com/PacktPublishing/Deep-Reinforcement-Learning-Hands-On/blob/master/Chapter08/lib/environ.py
 import numpy as np
-from environ import Actions
+import enum
+
+
+class Actions(enum.Enum):
+    Skip = 0
+    Buy = 1
+    Close = 2  # close means 'Sell All'
 
 
 class State(object):
-	"""docstring for State"""
-	def __init__(self, bars_count, commission, reset_on_close, reward_on_close=True,volumes=True):
-		assert isinstance(bars_count, int)
+    """docstring for State"""
+    def __init__(self, bars_count, commission_perc, reset_on_close, reward_on_close=True,volumes=True):
+        assert isinstance(bars_count, int)
         assert bars_count > 0
         assert isinstance(commission_perc, float)
         assert commission_perc >= 0.0
@@ -19,7 +25,7 @@ class State(object):
         self.volumes = volumes
 
     def reset(self, prices, offset):
-    	assert isinstance(prices, data.Prices)
+        assert isinstance(prices, data.Prices)
         assert offset >= self.bars_count-1
         self.have_position = False # already have bought some
         self.open_price = 0.0 # if already have position, then it is the cost_price
@@ -29,10 +35,10 @@ class State(object):
     @property
     def shape(self):
         if self.volumes:
-        	# [high, low, close] * bars + position_flag + rel_profit (since open)
+            # [high, low, close] * bars + position_flag + rel_profit (since open)
             return (4 * self.bars_count + 1 + 1, )
         else:
-        	# [high, low, close, volume] * bars + position_flag + rel_profit (since open)
+            # [high, low, close, volume] * bars + position_flag + rel_profit (since open)
             return (3 * self.bars_count + 1 + 1, )
 
     def encode(self):

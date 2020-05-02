@@ -1,37 +1,33 @@
 # ref: https://github.com/PacktPublishing/Deep-Reinforcement-Learning-Hands-On/blob/master/Chapter08/lib/environ.py
 
 import gym
-import enum
-import data_io as data
+from gym.utils import seeding
 import numpy as np
+from lib import data
+from lib.state import State, State1D, Actions
 
 DEFAULT_BARS_COUNT = 10
 DEFAULT_COMMISSION_PERC = 0.0
 
-class Actions(enum.Enum):
-	Skip = 0
-	Buy = 1
-	Close = 2  # close means 'Sell All'
 
-
-class StockEnv(gym.Env):
-	"""docstring for StockEnv"""
-	metadata = {'render.modes': ['human']}
+class StocksEnv(gym.Env):
+    """docstring for StockEnv"""
+    metadata = {'render.modes': ['human']}
 
     def __init__(self, prices, bars_count=DEFAULT_BARS_COUNT,
-                 commission=DEFAULT_COMMISSION_PERC, reset_on_close=True, state_1d=False,
-                 random_ofs_on_reset=True, reward_on_close=False, volumes=False):
-    	assert isinstance(prices, dict)
-    	self._prices = prices
-    	if state_1d:
-    		self._state = State1D(bars_count, commission, reset_on_close, reward_on_close,volumes)
-    	else:
-    		self._state = State(bars_count, commission, reset_on_close, reward_on_close,volumes)
+        commission=DEFAULT_COMMISSION_PERC, reset_on_close=True, state_1d=False,
+        random_ofs_on_reset=True, reward_on_close=False, volumes=False):
+        assert isinstance(prices, dict)
+        self._prices = prices
+        if state_1d:
+            self._state = State1D(bars_count, commission, reset_on_close, reward_on_close,volumes)
+        else:
+            self._state = State(bars_count, commission, reset_on_close, reward_on_close,volumes)
 
-    	self.action_space = gym.spaces.Discrete(n=len(Actions))
-    	self.obs_space = gym.spaces.Box(Low=-np.inf, high=np.inf, shape=self._state.shape, dtype=np.float32)
-    	self.random_ofs_on_reset = random_ofs_on_reset
-    	self.seed()
+        self.action_space = gym.spaces.Discrete(n=len(Actions))
+        self.obs_space = gym.spaces.Box(low=-np.inf, high=np.inf, shape=self._state.shape, dtype=np.float32)
+        self.random_ofs_on_reset = random_ofs_on_reset
+        self.seed()
 
     @classmethod
     def from_dir(cls, data_dir, **kwargs):
@@ -50,7 +46,7 @@ class StockEnv(gym.Env):
         self._state.reset(prices, offset)
         return self._state.encode()
 
-	def step(self, action_idx):
+    def step(self, action_idx):
         action = Actions(action_idx)
         reward, done = self._state.step(action)
         obs = self._state.encode()
