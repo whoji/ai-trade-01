@@ -5,6 +5,19 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 
+def default_states_preprocessor(states):
+    """
+    Convert list of states into the form suitable for model. By default we assume Variable
+    :param states: list of numpy arrays with states
+    :return: Variable
+    """
+    if len(states) == 1:
+        np_states = np.expand_dims(states[0], 0)
+    else:
+        np_states = np.array([np.array(s, copy=False) for s in states], copy=False)
+    return torch.tensor(np_states)
+
+
 class EpsilonGreedyActionSelector():
     def __init__(self, epsilon=0.05):
         self.epsilon = epsilon
@@ -18,7 +31,7 @@ class EpsilonGreedyActionSelector():
         actions[mask] = rand_actions
         return actions
 
-    def argmax_select(scores):
+    def argmax_select(self, scores):
     	return np.argmax(scores, axis=1)
 
 
@@ -28,10 +41,10 @@ class DQNAgent():
     DQNAgent is a memoryless DQN agent which calculates Q values
     from the observations and  converts them into the actions using action_selector
     """
-    def __init__(self, dqn_model, action_selector, device="cpu", preprocessor=None):
+    def __init__(self, dqn_model, action_selector, device="cpu", preprocessor=default_states_preprocessor):
         self.dqn_model = dqn_model
         self.action_selector = action_selector
-        #self.preprocessor = preprocessor
+        self.preprocessor = preprocessor
         self.device = device
 
     def initial_state(self):
@@ -50,15 +63,3 @@ class DQNAgent():
         actions = self.action_selector(q)
         return actions, agent_states
 
-
-# def default_states_preprocessor(states):
-#     """
-#     Convert list of states into the form suitable for model. By default we assume Variable
-#     :param states: list of numpy arrays with states
-#     :return: Variable
-#     """
-#     if len(states) == 1:
-#         np_states = np.expand_dims(states[0], 0)
-#     else:
-#         np_states = np.array([np.array(s, copy=False) for s in states], copy=False)
-#     return torch.tensor(np_states)

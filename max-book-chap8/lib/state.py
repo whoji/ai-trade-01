@@ -1,7 +1,7 @@
 # ref: https://github.com/PacktPublishing/Deep-Reinforcement-Learning-Hands-On/blob/master/Chapter08/lib/environ.py
 import numpy as np
 import enum
-
+from lib import data
 
 class Actions(enum.Enum):
     Skip = 0
