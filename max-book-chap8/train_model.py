@@ -9,7 +9,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 
-from lib import environ, data, model #, common, validation
+from lib import environ, data, model, agent, experience #, common, validation
 
 from tensorboardX import SummaryWriter
 
@@ -66,17 +66,17 @@ if __name__ == "__main__":
         raise RuntimeError("No data to train on")
     env = wrappers.TimeLimit(env, max_episode_steps=1000)
 
-    # val_data = {"YNDX": data.load_relative(args.valdata)}
-    # env_val = environ.StocksEnv(val_data, bars_count=BARS_COUNT, reset_on_close=True, state_1d=False)
+    val_data = {"YNDX": data.load_relative(args.valdata)}
+    env_val = environ.StocksEnv(val_data, bars_count=BARS_COUNT, reset_on_close=True, state_1d=False)
 
-    # writer = SummaryWriter(comment="-simple-" + args.run)
-    # net = models.SimpleFFDQN(env.observation_space.shape[0], env.action_space.n).to(device)
-    # tgt_net = ptan.agent.TargetNet(net)
-    # selector = ptan.actions.EpsilonGreedyActionSelector(EPSILON_START)
-    # agent = ptan.agent.DQNAgent(net, selector, device=device)
-    # exp_source = ptan.experience.ExperienceSourceFirstLast(env, agent, GAMMA, steps_count=REWARD_STEPS)
-    # buffer = ptan.experience.ExperienceReplayBuffer(exp_source, REPLAY_SIZE)
-    # optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE)
+    writer = SummaryWriter(comment="-simple-" + args.run)
+    net = model.SimpleFFDQN(env.obs_space.shape[0], env.action_space.n).to(device)
+    tgt_net = model.TargetNet(net)
+    selector = agent.EpsilonGreedyActionSelector(EPSILON_START)
+    agent = agent.DQNAgent(net, selector, device=device)
+    exp_source = experience.ExperienceSourceFirstLast(env, agent, GAMMA, steps_count=REWARD_STEPS)
+    buffer = experience.ExperienceReplayBuffer(exp_source, REPLAY_SIZE)
+    optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE)
 
     # # main training loop
     # step_idx = 0
