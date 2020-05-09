@@ -5,4 +5,4 @@ import yfinance as yf
 data = yf.download('AAPL', start="2017-04-01", end="2019-04-30")
 
 # Print the first five rows of the data
-data.head()
+print(data.head())
