@@ -1,0 +1,3 @@
+* reference: https://www.oreilly.com/content/algorithmic-trading-in-less-than-100-lines-of-python-code/
+
+* trade: EUR_USD
